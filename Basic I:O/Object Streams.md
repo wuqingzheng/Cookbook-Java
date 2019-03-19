@@ -1,0 +1,37 @@
+### Object Streams
+
+正如数据流支持原始数据类型的 I/O 一样，对象流也支持对象的 I/O。大多数（但不是全部）标准类支持其对象的序列化，这些类实现了 Serializable 接口。
+
+对象流类是 ObjectInputStream 和 ObjectOutputStream。这些类实现 ObjectInput 和 ObjectOutput，它们是 DataInput 和 DataOutput 的子接口。这意味着数据流中涵盖的所有原始数据 I/O 方法也在对象流中实现。因此，对象流可以包含原始值和对象值的混合。  ObjectStreams 示例说明了这一点。ObjectStreams 创建与 DataStreams 相同的应用程序，并进行了一些更改。首先，价格现在是BigDecimalobjects，以更好地代表小数值。其次，将 Calendar 对象写入数据文件，指示发票日期。
+
+如果 readObject() 没有返回期望的对象类型，则尝试将其强制转换为正确的类型可能会抛出 ClassNotFoundException。在这个简单的例子中，这不可能发生，因此我们不会尝试捕获异常。相反，我们通过向 main 方法的 throws 子句添加 ClassNotFoundException 来通知编译器我们已经意识到了这个问题。
+
+#### Output and Input of Complex Objects
+writeObject 和 readObject 方法易于使用，但它们包含一些非常复杂的对象管理逻辑。这对像 Calendar 这样的类来说并不重要，它只封装了原始值。但是许多对象包含对其他对象的引用。如果 readObject 要从流重建对象，则它必须能够重新构建原始对象所引用的所有对象。这些附加对象可能有自己的引用，依此类推。在这种情况下，writeObject 遍历整个对象引用Web，并将该 Web 中的所有对象写入流中。因此，对 writeObject 的单个调用可能导致将大量对象写入流。
+
+下图演示了这一点，其中调用 writeObject 来编写名为 a 的单个对象。该对象包含对象 b 和 c 的引用，而 b 包含对 d 和 e 的引用。调用 writeobject(a) 不仅写入一个，而且写入重构 a 所需的所有对象，因此也写入了此 Web 中的其他四个对象。当 readObject 读回 a 时，也会读回其他四个对象，并保留所有原始对象引用。
+
+![](https://docs.oracle.com/javase/tutorial/figures/essential/io-trav.gif)
+
+<center>I/O of multiple referred-to objects</center>
+
+您可能想知道如果同一个流上的两个对象都包含对单个对象的引用会发生什么。 当他们回读时，他们都会引用一个对象吗？ 答案是肯定的。 流只能包含一个对象的副本，尽管它可以包含任意数量的对象。 因此，如果您将对象显式写入流两次，那么您实际上只编写了两次引用。 例如，如果以下代码将对象ob写入流两次：
+
+```
+Object ob = new Object();
+out.writeObject(ob);
+out.writeObject(ob);
+```
+
+每个writeObject都必须由readObject匹配，因此读回流的代码将如下所示：
+
+```
+Object ob1 = in.readObject();
+Object ob2 = in.readObject();
+```
+
+这导致两个变量 ob1 和 ob2，它们是对单个对象的引用。
+
+但是，如果将单个对象写入两个不同的流，则它实际上是重复的 - 读取两个流的单个程序将看到两个不同的对象。
+
+

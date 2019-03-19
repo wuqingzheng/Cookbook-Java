@@ -1,0 +1,216 @@
+### Scanning and Formatting
+I/O 编程通常涉及到人们喜欢使用的整齐格式化数据的转换。为了帮助您完成这些杂务，Java 平台提供了两个 API。scanner API 将输入分解为与数据位相关联的个体信息。formatting API 将数据组装成格式良好且人类可读的形式。
+
+#### Scanning
+Scanner 类型的对象可用于将格式化输入分解为标记并根据其数据类型转换各个标记。
+
+##### Breaking Input into Tokens
+默认情况下 scanner 使用空格分隔标识符。（空格字符包括空格、制表符和行终止符。有关完整列表，请参阅[Character.isWhitespace](https://docs.oracle.com/javase/8/docs/api/java/lang/Character.html#isWhitespace-char-)的文档）要查看 scanner 的工作原理，让我们看看[ScanXan]()，这是一个读取并逐行打印出 xanadu.txt 中单个单词的程序。
+
+```
+import java.io.*;
+import java.util.Scanner;
+
+public class ScanXan {
+    public static void main(String[] args) throws IOException {
+
+        Scanner s = null;
+
+        try {
+            s = new Scanner(new BufferedReader(new FileReader("xanadu.txt")));
+
+            while (s.hasNext()) {
+                System.out.println(s.next());
+            }
+        } finally {
+            if (s != null) {
+                s.close();
+            }
+        }
+    }
+}
+```
+
+请注意，ScanXan 在使用 scanner 对象完成后会调用 Scanner 的 close 方法。即使 scanner 不是流，您也需要将其关闭以指示您已完成其基础流。
+
+ScanXan 的输出如下所示：
+
+```
+In
+Xanadu
+did
+Kubla
+Khan
+A
+stately
+pleasure-dome
+...
+```
+
+要使用不同的分隔标识符，请调用 useDelimiter()，指定正则表达式。例如，假设您希望分隔标识符为逗号，可选地后跟空格。 你会调用：
+
+
+```s.useDelimiter(",\\s*");```
+
+
+##### Translating Individual Tokens
+ScanXan 示例将所有输入标记视为简单的 String 值。Scanner 还支持所有 Java 语言的原始类型（char除外）的标记，以及 BigInteger 和 BigDecimal。此外，numeric 值可以使用数千个分隔符。因此，在美国语言环境中，Scanner 正确读取字符串 "32,767" 表示整数值。
+
+我们必须提到语言环境，因为千位分隔符和小数符号是特定于语言环境的。 因此，如果我们未指定扫描程序应使用美国语言环境，则以下示例将无法在所有语言环境中正常运行。这通常不必担心，因为您的输入数据通常来自使用相同语言环境的源。但是这个例子是 Java Tutorial 的一部分，并且分布在世界各地。
+
+ScanSum 示例读取双精度值列表并将其相加。这是来源：
+
+```
+import java.io.FileReader;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.Scanner;
+import java.util.Locale;
+
+public class ScanSum {
+    public static void main(String[] args) throws IOException {
+
+        Scanner s = null;
+        double sum = 0;
+
+        try {
+            s = new Scanner(new BufferedReader(new FileReader("usnumbers.txt")));
+            s.useLocale(Locale.US);
+
+            while (s.hasNext()) {
+                if (s.hasNextDouble()) {
+                    sum += s.nextDouble();
+                } else {
+                    s.next();
+                }   
+            }
+        } finally {
+            s.close();
+        }
+
+        System.out.println(sum);
+    }
+}
+
+```
+
+这是示例输入文件 usnumbers.txt
+
+```
+8.5
+32,767
+3.14159
+1,000,000.1
+```
+
+输出字符串是 "1032778.74159"。在某些语言环境中，句点将是不同的字符，因为 System.out 是 PrintStream 对象，并且该类不提供覆盖默认语言环境的方法。我们可以覆盖整个程序的语言环境 - 或者我们可以只使用格式化，如下一个主题 [Formatting]() 中所述。
+
+#### Formatting
+
+实现格式化的流对象是 PrintWriter（字符流类）或 PrintStream（字节流类）的实例。
+
+> 注意：您可能需要的唯一 PrintStream 对象是 System.out 和 System.err。（有关这些对象的更多信息，请参阅 [I/O from the Command Line ](https://docs.oracle.com/javase/tutorial/essential/io/cl.html)）当您需要创建格式化的输出流时，请实例化 PrintWriter，而不是 PrintStream。
+
+与所有字节流和字符流对象一样，PrintStream 和 PrintWriter 的实例实现了一组标准的写入方法，用于简单的字节和字符输出。 此外，PrintStream 和 PrintWriter 都实现了将内部数据转换为格式化输出的同一组方法。提供两个级别的格式：
+
+- print 和 println 以标准方式格式化各个值。
+- 格式基于格式字符串格式化几乎任意数量的值，具有许多用于精确格式化的选项。
+
+
+##### The print and println Methods
+Invoking print or println outputs a single value after converting the value using the appropriate toString method. We can see this in the Root example:
+
+```
+public class Root {
+    public static void main(String[] args) {
+        int i = 2;
+        double r = Math.sqrt(i);
+        
+        System.out.print("The square root of ");
+        System.out.print(i);
+        System.out.print(" is ");
+        System.out.print(r);
+        System.out.println(".");
+
+        i = 5;
+        r = Math.sqrt(i);
+        System.out.println("The square root of " + i + " is " + r + ".");
+    }
+}
+
+```
+
+以下是 Root 的输出
+
+```
+The square root of 2 is 1.4142135623730951.
+The square root of 5 is 2.23606797749979.
+```
+
+i 和 r 变量被格式化两次：第一次在 print 的重载中使用代码，第二次由 Java 编译器自动生成的转换代码，也使用 toString。您可以通过这种方式格式化任何值，但是您无法控制结果。
+
+##### The format Method
+format 方法根据格式字符串格式化多个参数。格式字符串由嵌入格式说明符的静态文本组成，除格式说明符外，格式字符串输出不变。
+
+格式字符串支持许多功能。在本教程中，我们将介绍一些基础知识。有关完整说明，请参阅 API 规范中的[format string syntax](https://docs.oracle.com/javase/8/docs/api/java/util/Formatter.html#syntax)。
+
+Root2 示例使用单个格式调用格式化两个值：
+
+```
+public class Root2 {
+    public static void main(String[] args) {
+        int i = 2;
+        double r = Math.sqrt(i);
+        
+        System.out.format("The square root of %d is %f.%n", i, r);
+    }
+}
+```
+
+以下是输出：
+
+```The square root of 2 is 1.414214.```
+
+与本示例中使用的三个一样，所有格式说明符都以 ％ 开头，并以 1 或 2 个字符的转换结尾，指定生成的格式化输出的类型。这里使用的三个转换是：
+
+- d 将整数值格式化为十进制值。
+- f 将浮点值格式化为十进制值。
+- n 输出特定于平台的行终结符。
+
+以下是其他一些转换：
+
+- x 将整数格式化为十六进制值。
+- s 将任何值格式化为字符串。
+- tB 将整数格式化为特定于语言环境的月份名称。
+- 还有很多其他转换。
+
+> Note:   
+> 除 %% 和 ％n 外，所有格式说明符必须与参数匹配。如果不这样做，则会抛出异常。
+> 在 Java 编程语言中，\n 转义符始终生成换行符（\u000A）。除非您特别需要换行符，否则请勿使用 \n。要获取本地平台的正确行分隔符，请使用 ％n。
+
+除了转换之外，格式说明符还可以包含几个其他元素，以进一步自定义格式化输出。Format 是一个使用每种可能元素的示例。
+
+```
+public class Format {
+    public static void main(String[] args) {
+        System.out.format("%f, %1$+020.10f %n", Math.PI);
+    }
+}
+```
+
+以下是输出：
+
+```3.141593, +00000003.1415926536```
+
+附加元素都是可选的。 下图显示了较长的说明符如何分解为元素。
+
+![](https://docs.oracle.com/javase/tutorial/figures/essential/io-spec.gif)
+
+<center>Elements of a Format Specifier</center>
+
+元素必须按所示顺序出现。从右侧开始，可选元素是：
+
+- Precision. 对于浮点值，这是格式化值的数学精度。对于 s 和其他常规转换，这是格式化值的最大宽度;如有必要，该值将被截断。
+- Width. 格式化值的最小宽度;必要时填充该值。默认情况下，该值使用空白填充。
+- Flags 指定其他格式选项。在 Format 示例中，+ 标志指定应始终使用符号格式化数字，0 标志指定 0 是填充字符。其他标志包括 -（右侧的pad）和（具有特定于语言环境的千位分隔符的格式号）。请注意，某些标志不能与某些其他标志一起使用或与某些转换一起使用。
+- Argument Index 允许您显式匹配指定的参数。您还可以指定 < 以匹配与前一个说明符相同的参数。因此该示例可以说：`System.out.format("%f, %<+020.10f %n", Math.PI)`;

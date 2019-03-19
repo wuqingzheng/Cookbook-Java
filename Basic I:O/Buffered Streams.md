@@ -1,0 +1,26 @@
+### Buffered Streams
+Most of the examples we've seen so far use unbuffered I/O. This means each read or write request is handled directly by the underlying OS. This can make a program much less efficient, since each such request often triggers disk access, network activity, or some other operation that is relatively expensive.
+
+To reduce this kind of overhead, the Java platform implements buffered I/O streams. Buffered input streams read data from a memory area known as a buffer; the native input API is called only when the buffer is empty. Similarly, buffered output streams write data to a buffer, and the native output API is called only when the buffer is full.
+
+A program can convert an unbuffered stream into a buffered stream using the wrapping idiom we've used several times now, where the unbuffered stream object is passed to the constructor for a buffered stream class. Here's how you might modify the constructor invocations in the CopyCharacters example to use buffered I/O:
+
+到目前为止，我们看到的大多数示例都使用无缓冲(unbuffered)的 I/O. 这意味着每个读取或写入请求都由底层操作系统直接处理。这使程序效率低得多，因为每个这样的请求经常触发磁盘访问、网络活动或一些相对昂贵的其他操作。
+
+为了减少这种开销，Java 平台实现了缓冲的 I/O 流。缓冲输入流从称为缓冲区的存储区读取数据，仅当缓冲区为空时才调用 native input API。类似地，缓冲输出流将数据写入缓冲区，并且仅在缓冲区已满时才调用 native output API。
+
+程序可以使用我们现在多次使用的包装习惯用法将无缓冲的流转换为缓冲流，其中无缓冲的流对象被传递给缓冲流类的构造函数。以下是如何修改 CopyCharacters 示例中的构造函数调用以使用缓冲 I/O：
+
+```
+inputStream = new BufferedReader(new FileReader("xanadu.txt"));
+outputStream = new BufferedWriter(new FileWriter("characteroutput.txt"));
+```
+
+有四个用于包装无缓冲流的缓冲流类：BufferedInputStream 和 BufferedOutputStream 创建缓冲字节流，而 BufferedReader 和 BufferedWriter 创建缓冲字符流。
+
+#### Flushing Buffered Streams
+在关键点写出缓冲区而无需等待它填满通常是有意义的。这称为刷新缓冲区。
+
+一些缓冲的输出类支持 autoflush，由可选的构造函数参数指定。当启用 autoflush 时，某些关键事件会导致刷新缓冲区。例如，autoflush PrintWriter 对象在每次调用 println 或 format 时刷新缓冲区。有关这些方法的更多信息，请参阅 [Formatting](https://docs.oracle.com/javase/tutorial/essential/io/formatting.html)
+
+要手动刷新流，请调用其 flush 方法。flush 方法在任何输出流上都有效，但除非缓冲流，否则无效。

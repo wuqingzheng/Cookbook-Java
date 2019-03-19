@@ -1,0 +1,29 @@
+### I/O Streams
+
+I/O 流表示输入源或输出目标。流(stream)可以表示许多不同类型的源和目标，包括磁盘文件、设备、其他程序和内存阵列。
+
+Streams 支持许多不同类型的数据，包括简单字节、原始数据类型、本地化字符和对象。 有些流只传递数据，而另一些以有用的方式操纵和转换数据。
+
+无论它们如何在内部工作，所有流都为使用它们的程序提供相同的简单模型：流是一序列数据。程序使用 input stream 从源读取数据，一次一个:
+
+![](https://docs.oracle.com/javase/tutorial/figures/essential/io-ins.gif)
+
+将信息读入程序
+
+程序使用 output stream 将数据写入目标，一次一个：
+
+![](https://docs.oracle.com/javase/tutorial/figures/essential/io-outs.gif)
+
+在本课中，我们将看到可以处理各种数据的流，从原始值到高级对象。
+
+上图所示的数据源和数据目标可以是保存、生成或使用数据的任何内容。显然这包括磁盘文件，但源或目标也可以是另一个程序、外围设备、网络套接字或数组。
+
+在下一节中，我们将使用最基本的流类型字节流来演示流 I/O 的常见操作。对于示例输入，我们将使用包含以下诗句的示例文件 xanadu.txt。
+
+```
+In Xanadu did Kubla Khan
+A stately pleasure-dome decree:
+Where Alph, the sacred river, ran
+Through caverns measureless to man
+Down to a sunless sea.
+```

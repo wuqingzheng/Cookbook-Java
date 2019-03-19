@@ -1,0 +1,50 @@
+## Lesson: Basic I/O
+
+[Basic I/O](https://docs.oracle.com/javase/tutorial/essential/io/index.html) 涵盖用于基本输入和输出的 Java 平台类。它主要关注 I/O 流，这是一个强大的概念，可以大大简化 I/O 操作。本课程还介绍了序列化，它允许程序将整个对象写入流并再次读回。然后，本课程将介绍一些文件系统操作，包括随机访问文件。最后，简要介绍了 New I/O API 的高级功能。
+
+I/O Streams 部分中涵盖的大多数类都在 java.io 包中。 File I/O 部分中介绍的大多数类都在 java.nio.file 包中。
+
+### I/O Streams
+
+- Byte Streams 处理原始二进制数据的 I/O。
+- Character Streams 处理字符数据的 I/O，自动处理与本地字符集的转换。
+- Buffered Streams 通过减少对 native API 的调用次数来优化输入和输出。
+- Scanning and Formatting 允许程序读取和写入格式化文本。
+- I/O from the Command Line 描述了标准流和控制台对象。
+- Data Streams 处理原始数据类型和字符串值的二进制 I/O。
+- Object Streams 处理对象的二进制 I/O.
+
+### File I/O (Featuring NIO.2)
+
+- What is a Path? 检查文件系统上 path 的概念。
+- The Path Class 介绍了 java.nio.file 包的基础类。
+- Path Operations 查看 Path 类中处理语法操作的方法。
+- File Operations 介绍了许多文件 I/O 方法的常见概念。
+- Checking a File or Directory 显示如何检查一个文件的存在及其可访问性级别。
+- Deleting a File or Directory。
+- Copying a File or Directory。
+- Moving a File or Directory。
+- Managing Metadata 解释了如何读取和设置文件属性(file attributes)。
+- Reading, Writing and Creating Files 显示用于读取和写入文件的流(stream)和通道(channel)方法。
+- Random Access Files 演示了如何以非顺序方式读取或写入文件。
+- Creating and Reading Directories 涵盖了特定于目录的 API，例如如何列出目录的内容。
+- Links, Symbolic or Otherwise 涵盖了特定于符号(symbolic)和硬链接(hard links)的问题。
+- Walking the File Tree 演示了如何递归访问文件树中的每个文件和目录。
+- Finding Files 显示如何使用模式匹配搜索文件。
+- Watching a Directory for Changes 显示如何使用监视服务(watch service)来检测在一个或多个目录中添加、删除或更新的文件。
+- Other Useful Methods 涵盖了本课程其他部分不适用的重要 API。
+- Legacy File I/O Code 显示如果使用 java.io.File 类的旧代码，如何利用 Path 功能。提供了将 java.io.File API 映射到 java.nio.file API 的表。
+
+### Summary
+
+该 trail 中所涵盖的关键点的摘要。
+
+### Questions and Exercises
+
+通过尝试这些问题和练习来测试你在这个过程中学到了什么。
+
+### The I/O Classes in Action
+
+下一个 trail 中的许多示例，例如 Custom Networking 使用本课程中描述的 I/O 流来读取和写入网络连接。
+
+> 安全考虑: 某些 I/O 操作需要得到当前安全管理器的批准。这些课程中包含的示例程序是独立应用程序，默认情况下没有安全管理器。要在 applet 中工作，大多数这些示例都必须进行修改。有关 applet 上的安全限制的信息，请参阅[What Applets Can and Cannot Do ](https://docs.oracle.com/javase/tutorial/deployment/applet/security.html)。
